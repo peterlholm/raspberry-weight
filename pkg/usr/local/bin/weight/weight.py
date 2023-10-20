@@ -1,7 +1,8 @@
+#!/bin/python3
 import sys
 from time import sleep
 from datetime import datetime
-import time
+#import time
 from bluetooth import *
 import requests	
 	
@@ -83,7 +84,7 @@ while True:
     if Count>=21:
         if Test: print("Decoding")
         Year=Message[0]*256+Message[1]
-	    Year=2023
+        Year=2023
         Month = Message[2]
         Day = Message[3]
         Hour = Message[4]

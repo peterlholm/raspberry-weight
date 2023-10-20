@@ -1,0 +1,24 @@
+[MASTER]
+
+logging-format-style=new
+
+[MESSAGES CONTROL]
+#enable=R,
+#        missing-function-docstring
+
+enable=all
+
+disable=line-too-long,
+        missing-module-docstring,
+        #missing-function-docstring,
+        #missing-class-docstring,
+
+[BASIC]
+
+good-names=i,
+           j,
+           s,
+           p,
+           sx,sy,sz,
+           vx,vy,vz,
+           tm
