@@ -1,42 +1,60 @@
 #!/bin/python3
 import sys
+import signal
 from time import sleep
 from datetime import datetime
 #import time
-from bluetooth import *
-import requests	
-	
-Test = 1
+from bluetooth import BluetoothSocket, RFCOMM, BluetoothError
+import requests
+
+TEST = 1
 
 #MyDevice = '00:18:12:22:01:3B'
 #MyDevice = '00:18:12:22:01:19'
-MyDevice = '00:18:12:51:81:07'
+MY_DEVICE = '00:18:12:51:81:07'
 #MyDevice = '00:18:12:51:81:17'
 #MyDevice = 'CC:B1:1A:01:41:C5'
 #MyDevice = '00:18:12:22:01:26' smidt ud
 
 DB_HOST = "http://motion.holmnet.dk/"
 
+
+def receive_signal(signal_number, frame):
+    "signal handling"
+    if signal_number ==signal.SIGINT:
+        print("Received SIGINT - terminating")
+        sys.exit(0)
+    elif signal_number==signal.SIGTERM:
+        print("Receiving signal", signal.SIGTERM, " - Terminating")
+        sys.exit(0)
+    else:
+        print(f'Received Signal: {signal_number} {frame}')
+        sys.exit(signal_number)
+
 current_time = datetime.now()
 
-print(str(current_time) + " Weight starting ")  
-	
+print(str(current_time) + " Weight starting ")
+
+# initialization
+signal.signal(signal.SIGTERM, receive_signal)
+signal.signal(signal.SIGINT, receive_signal)
+
 while True:
-    Found = True
+    FOUND = True
 
 ########################################################
 
     print("Connecting to device")
-    
-    Connected = False
-    while not Connected:
+
+    CONNECTED = False
+    while not CONNECTED:
         try:
-            if Test:
+            if TEST:
                 print("connecting...")
             client = BluetoothSocket(RFCOMM)
-            client.connect((MyDevice, 1))
+            client.connect((MY_DEVICE, 1))
         except IOError as ex:
-            if Test:
+            if TEST:
                 print("unable to connect:" + str(ex))
                 print("Sleeping..")
                 sys.stdout.flush()
@@ -44,7 +62,7 @@ while True:
         except Exception as ex:
             print('Connected exception: ' + str(ex))
         else:
-            Connected = True
+            CONNECTED = True
     current_time = datetime.now()
     print (str(current_time) + ' connected')
 
@@ -60,7 +78,8 @@ while True:
                 print("Not data")
                 break
             else:
-                if Test: sys.stdout.write('.')
+                if TEST:
+                    sys.stdout.write('.')
                 Message += data
                 Count += len(data)
         except BluetoothError as ex:
@@ -68,8 +87,10 @@ while True:
             break
         except IOError as ex:
             print ("Exception  IOerror: " + str(ex) + str(type(ex)))
-            print ("I/O error({0}): {1}".format(ex.errno, ex.strerror))
-            print(ex.message)
+            #print ("I/O error({0}): {1}".format(ex.errno, ex.strerror))
+            print(f"I/O error({ex.errno}):{ex.strerror}")
+            #print(ex.message)
+            print(ex)
             print ('vars')
             print(vars(ex))
             print ('dir')
@@ -80,9 +101,10 @@ while True:
     client.close()
 
     print("")
-    
+
     if Count>=21:
-        if Test: print("Decoding")
+        if TEST:
+            print("Decoding")
         Year=Message[0]*256+Message[1]
         Year=2023
         Month = Message[2]
@@ -100,16 +122,16 @@ while True:
         Moisture = (Message[17]*256+Message[18])/10.0
         Calorie = Message[19]*256+Message[20]
 
-        
         print("Weight: %2.1f kg" % (Weight))
-        if Test: print("Fat %2.1f %% Bone %2.1f kg Muscle %2.1f kg Vfat %3d Moist %2.1f %% Cal %3d" % (Fat, Bone, Muscle,Vfat, Moisture,Calorie))
+        if TEST:
+            print(f"Fat {Fat:2.1f} %% Bone {Bone:2.1f} kg Muscle {Muscle:2.1f} kg Vfat {Vfat:3d} Moist {Moisture:%2.1f} %% Cal {Calorie:3d}")
 
         DateTime = "{:04d}-{:02d}-{:02d}%20{:02d}:{:02d}:{:02d}".format(Year, Month, Day, Hour, Min, Sec)
         Date = "{:4d}-{:02d}-{:02d}".format(Year, Month, Day)
 
-        if Test: print(DateTime)
-        
-        fp=open('data.csv', 'a')
+        if TEST: print(DateTime)
+
+        fp=open('data.csv', 'a', encoding="UTF-8")
         fp.write("%04d-%02d-%02d %02d:%02d:%02d," % (Year, Month, Day, Hour, Min, Sec))
         fp.write("%2.1f, %2.1f, %2.1f," % (Weight, Fat, Bone))
         fp.write("%2.1f, %3d, %2.1f, %3d \n" % (Muscle, Vfat, Moisture, Calorie))
@@ -123,9 +145,9 @@ while True:
         #print (r.status_code)
         #print (r.text)
 
-        if Test: print (r)
-        sleep(25) 
+        if TEST:
+            print (r)
+        sleep(25)
 current_time = datetime.now()
 print (str(current_time) + ' Finish')
 print ("FINISH")
-

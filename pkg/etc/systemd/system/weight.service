@@ -1,0 +1,20 @@
+#
+# weight service
+#
+
+[Unit]
+Description=Weight service
+After=network.target
+StartLimitIntervalSec=30
+
+[Service]
+Type=idle
+Restart=on-failure
+RestartSec=60
+User=root
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=append:/var/log/weight_service.log
+ExecStart=/usr/local/bin/weight/weight.py
+
+[Install]
+WantedBy=multi-user.target
