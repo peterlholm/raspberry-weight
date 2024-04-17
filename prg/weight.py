@@ -33,7 +33,7 @@ def receive_signal(signal_number, frame):
 
 current_time = datetime.now()
 
-print(str(current_time) + " Weight starting ")
+print("Weight starting " + str(current_time))
 
 # initialization
 signal.signal(signal.SIGTERM, receive_signal)
@@ -69,19 +69,18 @@ while True:
 #################################################
 
     Message = bytearray([])
-    Count = 0
+    COUNT = 0
     sys.stdout.write("receiving.. ")
-    while Count<21:
+    while COUNT<21:
         try:
-            data = client.recv(21-Count)
+            data = client.recv(21-COUNT)
             if not data:
                 print("Not data")
                 break
-            else:
-                if TEST:
-                    sys.stdout.write('.')
-                Message += data
-                Count += len(data)
+            if TEST:
+                sys.stdout.write('.')
+            Message += data
+            COUNT += len(data)
         except BluetoothError as ex:
             print ("Exception  BlueToothError: " + str(ex) )
             break
@@ -102,11 +101,11 @@ while True:
 
     print("")
 
-    if Count>=21:
+    if COUNT>=21:
         if TEST:
             print("Decoding")
-        Year=Message[0]*256+Message[1]
-        Year=2024
+        YEAR=Message[0]*256+Message[1]
+        YEAR=2024
         Month = Message[2]
         Day = Message[3]
         Hour = Message[4]
@@ -122,26 +121,31 @@ while True:
         Moisture = (Message[17]*256+Message[18])/10.0
         Calorie = Message[19]*256+Message[20]
 
-        print("Weight: %2.1f kg" % (Weight))
+        print(f"Weight: {Weight:2.1f} kg")
         if TEST:
-            print(f"Fat {Fat:2.1f} %% Bone {Bone:2.1f} kg Muscle {Muscle:2.1f} kg Vfat {Vfat:3d} Moist {Moisture:%2.1f} %% Cal {Calorie:3d}")
+            print(f"Fat {Fat:2.1f} %% Bone {Bone:2.1f} kg Muscle {Muscle:2.1f} kg Vfat {Vfat:3d} Moist {Moisture:2.1f} %% Cal {Calorie:3d}")
 
-        DateTime = "{:04d}-{:02d}-{:02d}%20{:02d}:{:02d}:{:02d}".format(Year, Month, Day, Hour, Min, Sec)
-        Date = "{:4d}-{:02d}-{:02d}".format(Year, Month, Day)
+        # DateTime = "{:04d}-{:02d}-{:02d}%20{:02d}:{:02d}:{:02d}".format(YEAR, Month, Day, Hour, Min, Sec)
+        # Date = "{:4d}-{:02d}-{:02d}".format(YEAR, Month, Day)
+        DateTime = f"{YEAR:04d}-{Month:02d}-{Day:02d}%20{Hour:02d}:{Min:02d}:{Sec:02d}"
+        Date = f"{YEAR:4d}-{Month:02d}-{Day:02d}"
+        if TEST:
+            print(DateTime)
 
-        if TEST: print(DateTime)
-
-        fp=open('data.csv', 'a', encoding="UTF-8")
-        fp.write("%04d-%02d-%02d %02d:%02d:%02d," % (Year, Month, Day, Hour, Min, Sec))
-        fp.write("%2.1f, %2.1f, %2.1f," % (Weight, Fat, Bone))
-        fp.write("%2.1f, %3d, %2.1f, %3d \n" % (Muscle, Vfat, Moisture, Calorie))
-        fp.close()
+        with open('data.csv', 'a', encoding="UTF-8") as fp:
+            # fp.write("%04d-%02d-%02d %02d:%02d:%02d," % (YEAR, Month, Day, Hour, Min, Sec))
+            # fp.write("%2.1f, %2.1f, %2.1f," % (Weight, Fat, Bone))
+            # fp.write("%2.1f, %3d, %2.1f, %3d \n" % (Muscle, Vfat, Moisture, Calorie))
+            fp.write(DateTime)
+            fp.write(f"{Weight:2.1f}, {Fat:2.1f}, {Bone:2.1f},")
+            fp.write(f"{Muscle:2.1f}, {Vfat:3d}, {Moisture:2.1f}, {Calorie:3d}\n")
+            #fp.close()
 
         url= (DB_HOST +"motion/save.php?save&DateTime="+DateTime+"&Date="+Date+ \
               "&Weight={:03.1f}&Height={:03d}&Fat={:03.1f}&Bone={:03.1f}&Muscle={:03.1f}&Vfat={:03d}&Moisture={:03.1f}&Calorie={:04.0f}&Age={:02d}").format(
                   Weight, Height, Fat, Bone, Muscle, Vfat, Moisture, Calorie, Age)
         #print(url)
-        r = requests.get(url) #, auth=('user', 'pass'))
+        r = requests.get(url, timeout=10) #, auth=('user', 'pass'))
         #print (r.status_code)
         #print (r.text)
 
