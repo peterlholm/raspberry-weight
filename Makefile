@@ -9,12 +9,17 @@ help:
 
 install:
 	mkdir -p /usr/local/bin/weight
-	chmod a+x prg/*.py
-	cp -rp pkg/usr/local/bin/weight /usr/local/bin/weight
+	chmod a+x prg/weight.py
+	cp -rp prg/weight.py /usr/local/bin/weight
+	cp systemd/system/weight.service /etc/systemd/system/
+	ln -s /etc/systemd/system/weight.service /etc/systemd/system/multi-user.target.wants/weight.service
 
 uninstall:
 	rm -fr /usr/local/bin/weight 
-
+	rm -f /etc/systemd/system/weight.service
+	rm -f /var/log/weight-service.log
+	rm -f /etc/systemd/system/multi-user.target.wants/weight.service
+	
 deb-pkg:
 	mkdir -p tmp/pkg/DEBIAN
 	cp -r pkg/DEBIAN/* tmp/pkg/DEBIAN

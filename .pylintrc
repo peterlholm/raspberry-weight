@@ -6,8 +6,9 @@ logging-format-style=new
 #enable=R,
 #        missing-function-docstring
 
-enable=all
+#enable=all
 
+enable=W,C,R
 disable=line-too-long,
         missing-module-docstring,
         #missing-function-docstring,
@@ -16,9 +17,5 @@ disable=line-too-long,
 [BASIC]
 
 good-names=i,
-           j,
-           s,
-           p,
-           sx,sy,sz,
-           vx,vy,vz,
-           tm
+           j
+
