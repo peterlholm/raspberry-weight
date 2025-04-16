@@ -106,7 +106,7 @@ while True:
         YEAR=Message[0]*256+Message[1]
         if _DEBUG:
             print(f"{YEAR}, {Message[0]}, {Message[0]}" )
-        YEAR=2024
+        YEAR=2025
         Month = Message[2]
         Day = Message[3]
         Hour = Message[4]
