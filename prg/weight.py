@@ -16,7 +16,7 @@ MY_DEVICE = '00:18:12:51:81:07'
 #MyDevice = '00:18:12:22:01:19'
 #MyDevice = 'CC:B1:1A:01:41:C5'
 
-DB_HOST = "http://motion.holmnet.dk/"
+DB_HOST = "http://holmnet.dk/"
 
 def receive_signal(signal_number, frame):
     "signal handling"

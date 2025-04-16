@@ -25,7 +25,7 @@ deb-pkg:
 	cp -r pkg/DEBIAN/* tmp/pkg/DEBIAN
 	mkdir -p tmp/pkg/usr/local/bin/weight tmp/pkg/etc/systemd/systemd
 	cp prg/weight.py tmp/pkg/usr/local/bin/weight
-	cp systemd/weight.service tmp/pkg/etc/systemd/system
+	cp systemd/system/weight.service tmp/pkg/etc/systemd/system
 	dpkg-deb --build --root-owner-group tmp/pkg tmp/$(PKG_NAME).deb
 
 clean:
