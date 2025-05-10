@@ -1,5 +1,5 @@
-pybluez
+#pybluez
 # require apt python3-bluez on ubuntu
-#pylint
-#vulture
+pylint
+vulture
 
